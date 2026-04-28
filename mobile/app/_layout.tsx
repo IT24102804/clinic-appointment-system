@@ -6,7 +6,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  anchor: 'index',
 };
 
 export default function RootLayout() {
@@ -15,14 +15,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)/splash" options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)/welcome" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/complete-profile" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="prescriptions/new" options={{ headerShown: false }} />
-        <Stack.Screen name="prescriptions/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="prescriptions/[id]/edit" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/patients" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/doctors" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/billing" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/medical-records" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="dark" />
     </ThemeProvider>

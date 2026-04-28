@@ -3,7 +3,9 @@ const cors = require("cors");
 const morgan = require("morgan");
 const path = require("path");
 
-const prescriptionRoutes = require("./routes/prescriptionRoutes");
+const authRoutes = require("./routes/authRoute");
+const userRoutes = require("./routes/userRoutes");
+const patientRoutes = require("./routes/patientRoutes");
 
 const app = express();
 
@@ -27,7 +29,9 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/patients", patientRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

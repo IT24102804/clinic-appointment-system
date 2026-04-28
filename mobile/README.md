@@ -2,6 +2,72 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## App architecture (frontend)
+
+This mobile app follows the flow:
+
+UI (screens) → Services (API calls) → Backend Controllers → MongoDB → Response → UI
+
+### Key folders
+
+- **app/**
+  - File-based routes (screens) powered by Expo Router.
+  - Example:
+    - `app/(auth)/login.tsx` (UI)
+    - `app/(auth)/complete-profile.tsx` (UI)
+
+- **components/**
+  - Reusable building blocks.
+  - `components/ui/*` contains shared UI components (buttons, inputs, logo, cards, etc.).
+
+- **services/**
+  - Central place for all HTTP calls.
+  - Examples:
+    - `services/auth.ts` calls `/api/auth/*`
+    - `services/patients.ts` calls `/api/patients/*`
+
+- **types/**
+  - TypeScript types used by UI + services.
+  - Examples:
+    - `types/auth.ts`
+    - `types/patient.ts`
+
+## Patient registration + login (Option A + Option 2)
+
+### Registration (patient only)
+
+- UI: `app/(auth)/register.tsx`
+- Service: `services/auth.ts` (`registerPatient`)
+- Backend: `POST /api/auth/register`
+
+The frontend always sends `role: "patient"` during registration, so any user created via the mobile app is automatically a patient.
+
+After successful registration, the user is redirected to the login screen.
+
+### Login + profile check (Option A)
+
+- UI: `app/(auth)/login.tsx`
+- Service: `services/auth.ts` (`login`)
+- Backend: `POST /api/auth/login`
+
+After login, the app immediately calls:
+
+- Service: `services/patients.ts` (`getPatientProfile`)
+- Backend: `GET /api/patients/profile`
+
+Routing rules:
+
+- If `GET /api/patients/profile` returns **200** → redirect to `/(tabs)`.
+- If it returns **404** → redirect to `/(auth)/complete-profile` so the patient can create their profile.
+
+### Complete profile
+
+- UI: `app/(auth)/complete-profile.tsx`
+- Service: `services/patients.ts` (`createPatientProfile`)
+- Backend: `POST /api/patients/profile`
+
+After profile creation succeeds, the user is redirected to `/(tabs)`.
+
 ## Get started
 
 1. Install dependencies

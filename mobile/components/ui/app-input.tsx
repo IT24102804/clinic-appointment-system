@@ -10,6 +10,7 @@ export function AppInput({ multiline = false, style, ...props }: AppInputProps) 
   return (
     <TextInput
       {...props}
+      placeholderTextColor={props.placeholderTextColor ?? AppColors.textMuted}
       multiline={multiline}
       textAlignVertical={multiline ? "top" : props.textAlignVertical}
       style={[styles.input, multiline && styles.multilineInput, style]}

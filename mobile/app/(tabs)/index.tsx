@@ -1,53 +1,14 @@
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { AppButton } from "@/components/ui/app-button";
 import { AppCard } from "@/components/ui/app-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { AppScreen } from "@/components/ui/app-screen";
-import { StatePanel } from "@/components/ui/state-panel";
 import { AppColors } from "@/constants/design";
-import { listPrescriptions } from "@/services/prescriptions";
-import { Prescription } from "@/types/prescription";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const summary = useMemo(() => {
-    const issued = prescriptions.filter((item) => item.status === "issued").length;
-    const drafts = prescriptions.filter((item) => item.status === "draft").length;
-    const withAttachments = prescriptions.filter((item) => item.attachmentUrl).length;
-
-    return {
-      total: prescriptions.length,
-      issued,
-      drafts,
-      withAttachments,
-    };
-  }, [prescriptions]);
-
-  const loadHomeData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await listPrescriptions();
-      setPrescriptions(data);
-      setError(null);
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Unable to load the dashboard.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      void loadHomeData();
-    }, [loadHomeData])
-  );
 
   return (
     <AppScreen scroll contentContainerStyle={styles.screen}>
@@ -59,8 +20,8 @@ export default function HomeScreen() {
       />
 
       <View style={styles.actionRow}>
-        <AppButton label="Create prescription" onPress={() => router.push("/prescriptions/new")} />
-        <AppButton label="Browse modules" onPress={() => router.push("/(tabs)/more")} variant="secondary" />
+        <AppButton label="Browse modules" onPress={() => router.push("/(tabs)/more")} />
+        <AppButton label="Open appointments" onPress={() => router.push("/(tabs)/appointments")} variant="secondary" />
       </View>
 
       <View style={styles.sectionHeader}>
@@ -102,47 +63,6 @@ export default function HomeScreen() {
           This live section keeps the dashboard practical. It shows what is waiting, what is complete, and how much documentation is attached right now.
         </Text>
       </View>
-
-      {loading ? (
-        <StatePanel loading message="Loading the latest prescription activity..." />
-      ) : error ? (
-        <StatePanel
-          title="Dashboard unavailable"
-          message={error}
-          variant="error"
-          actionLabel="Retry dashboard"
-          onAction={() => void loadHomeData()}
-        />
-      ) : (
-        <View style={styles.snapshotStack}>
-          <AppCard style={styles.highlightCard}>
-            <Text style={styles.highlightEyebrow}>Live now</Text>
-            <Text style={styles.highlightTitle}>{summary.drafts} drafts need review</Text>
-            <Text style={styles.highlightText}>
-              Open the prescription queue to finish drafts, issue medication instructions, and keep the treatment flow clear.
-            </Text>
-          </AppCard>
-
-          <View style={styles.metricsGrid}>
-            <AppCard style={styles.metricCard}>
-              <Text style={styles.metricValue}>{summary.total}</Text>
-              <Text style={styles.metricLabel}>Total prescriptions</Text>
-            </AppCard>
-            <AppCard style={styles.metricCard}>
-              <Text style={styles.metricValue}>{summary.issued}</Text>
-              <Text style={styles.metricLabel}>Issued records</Text>
-            </AppCard>
-            <AppCard style={styles.metricCard}>
-              <Text style={styles.metricValue}>{summary.drafts}</Text>
-              <Text style={styles.metricLabel}>Draft records</Text>
-            </AppCard>
-            <AppCard style={styles.metricCard}>
-              <Text style={styles.metricValue}>{summary.withAttachments}</Text>
-              <Text style={styles.metricLabel}>With attachments</Text>
-            </AppCard>
-          </View>
-        </View>
-      )}
     </AppScreen>
   );
 }
@@ -165,32 +85,6 @@ const styles = StyleSheet.create({
   sectionSubtitle: {
     fontSize: 14,
     lineHeight: 21,
-    color: AppColors.textMuted,
-  },
-  snapshotStack: {
-    gap: 12,
-  },
-  highlightCard: {
-    padding: 18,
-    gap: 8,
-    backgroundColor: AppColors.accentSoft,
-    borderColor: "#c5e2eb",
-  },
-  highlightEyebrow: {
-    fontSize: 12,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    color: AppColors.accent,
-  },
-  highlightTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: AppColors.text,
-  },
-  highlightText: {
-    fontSize: 15,
-    lineHeight: 22,
     color: AppColors.textMuted,
   },
   quickGrid: {
@@ -218,26 +112,6 @@ const styles = StyleSheet.create({
   quickText: {
     fontSize: 15,
     lineHeight: 22,
-    color: AppColors.textMuted,
-  },
-  metricsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
-  metricCard: {
-    width: "47%",
-    padding: 18,
-    gap: 6,
-  },
-  metricValue: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: AppColors.text,
-  },
-  metricLabel: {
-    fontSize: 14,
-    lineHeight: 20,
     color: AppColors.textMuted,
   },
 });
