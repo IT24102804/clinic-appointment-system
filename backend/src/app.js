@@ -3,7 +3,8 @@ const cors = require("cors");
 const morgan = require("morgan");
 const path = require("path");
 
-const prescriptionRoutes = require("./routes/prescriptionRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes");
+const doctorRoutes = require("./routes/doctorRoutes");
 
 const app = express();
 
@@ -27,7 +28,8 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/doctors", doctorRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
