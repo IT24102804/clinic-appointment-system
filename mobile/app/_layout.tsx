@@ -16,13 +16,13 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="prescriptions/new" options={{ headerShown: false }} />
-        <Stack.Screen name="prescriptions/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="prescriptions/[id]/edit" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/patients" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/doctors" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/billing" options={{ headerShown: false }} />
-        <Stack.Screen name="placeholders/medical-records" options={{ headerShown: false }} />
+        <Stack.Screen name="appointments/new" options={{ headerShown: false }} />
+        <Stack.Screen name="appointments/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="appointments/[id]/edit" options={{ headerShown: false }} />
+        <Stack.Screen name="doctors/index" options={{ headerShown: false }} />
+        <Stack.Screen name="doctors/new" options={{ headerShown: false }} />
+        <Stack.Screen name="doctors/[id]/index" options={{ headerShown: false }} />
+        <Stack.Screen name="doctors/[id]/edit" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="dark" />
     </ThemeProvider>
