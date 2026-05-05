@@ -1,59 +1,47 @@
-const jwt = require("jsonwebtoken");
+import crypto from "crypto";
 
-const User = require("../models/User");
-const asyncHandler = require("../utils/asyncHandler");
+const tokenSecret = () => process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET || "clinicapp_dev_secret";
 
-const authenticate = asyncHandler(async (req, res, next) => {
-  const header = req.headers.authorization || "";
-  const [scheme, token] = header.split(" ");
+export const signToken = (payload) => {
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signature = crypto.createHmac("sha256", tokenSecret()).update(body).digest("base64url");
+  return `${body}.${signature}`;
+};
 
-  if (scheme !== "Bearer" || !token) {
-    return res.status(401).json({
-      success: false,
-      message: "Authentication token is required.",
-    });
+export const verifyToken = (token) => {
+  const [body, signature] = String(token || "").split(".");
+  if (!body || !signature) return null;
+
+  const expected = crypto.createHmac("sha256", tokenSecret()).update(body).digest("base64url");
+  if (Buffer.byteLength(signature) !== Buffer.byteLength(expected)) return null;
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+
+  return JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+};
+
+export const protect = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, message: "Authorization token required." });
   }
 
-  let decoded;
-
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message:
-        error.name === "TokenExpiredError"
-          ? "Authentication token expired."
-          : "Authentication token is invalid.",
-    });
-  }
-  const user = await User.findById(decoded.id).select("-passwordHash");
-
-  if (!user || user.status !== "active") {
-    return res.status(401).json({
-      success: false,
-      message: "User account is not active or no longer exists.",
-    });
+  const payload = verifyToken(authHeader.slice("Bearer ".length).trim());
+  if (!payload?.id) {
+    return res.status(401).json({ success: false, message: "Invalid or expired token." });
   }
 
-  req.user = user;
+  req.user = { id: payload.id, role: payload.role };
   next();
-});
+};
 
-function authorizeRoles(...roles) {
-  return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "You do not have permission to perform this action.",
-      });
-    }
+export const authorize = (...roles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: "Not authenticated." });
+  }
 
-    next();
-  };
-}
+  if (!roles.includes(req.user.role)) {
+    return res.status(403).json({ success: false, message: "Forbidden." });
+  }
 
-module.exports = {
-  authenticate,
-  authorizeRoles,
+  next();
 };

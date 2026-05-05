@@ -1,7 +1,16 @@
-import { createCrudService } from "@/services/crud-service";
-import { CrudRecord } from "@/types/crud";
+import api from "./api";
 
-export type Appointment = CrudRecord;
-export type AppointmentPayload = Record<string, unknown>;
+export const listAppointments = async () => {
+  const response = await api.get("/appointments");
+  return response.data;
+};
 
-export const appointmentService = createCrudService<Appointment, AppointmentPayload>("/api/appointments");
+export const getAppointment = async (id: string) => {
+  const response = await api.get(`/appointments/${id}`);
+  return response.data;
+};
+
+export const createAppointment = async (data: any) => {
+  const response = await api.post("/appointments", data);
+  return response.data;
+};

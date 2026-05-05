@@ -42,6 +42,8 @@ function resolveApiBaseUrl() {
     return buildLocalApiUrl(candidateHosts[0]);
   }
 
+  return "http://192.168.1.13:5000";
+
   if (Platform.OS === "android") {
     return "http://10.0.2.2:5000";
   }
