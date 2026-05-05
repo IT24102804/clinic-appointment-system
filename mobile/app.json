@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "BillingApp",
+    "slug": "billing-app",
+    "version": "1.0.0",
+    "sdkVersion": "55.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "plugins": [
+      "expo-router"
+    ],
+    "scheme": "billing-app"
+  }
+}
